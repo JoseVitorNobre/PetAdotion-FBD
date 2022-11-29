@@ -28,7 +28,7 @@ CREATE TABLE pet(
 
 CREATE TABLE doacao(
 	id_doacao SERIAL PRIMARY KEY,
-	id_pet INTEGER NOT NULL,
+	id_pet INTEGER NOT NULL UNIQUE,
 	data_doacao DATE NOT NULL,
 	cpf_doador VARCHAR(11) NOT NULL,	
 	FOREIGN KEY(id_pet) REFERENCES pet(id),
@@ -37,7 +37,7 @@ CREATE TABLE doacao(
 
 CREATE TABLE adocao(
 	id_adocao SERIAL PRIMARY KEY,
-	id_pet INTEGER NOT NULL,
+	id_pet INTEGER NOT NULL UNIQUE,
 	data_adocao DATE NOT NULL,
 	cpf_adotante VARCHAR(11) NOT NULL,
 	FOREIGN KEY(id_pet) REFERENCES pet(id),
@@ -46,7 +46,7 @@ CREATE TABLE adocao(
 
 -- Functions
 --  Ao inserir uma adocao atualizar tabela pet
-CREATE OR REPLACE FUNCTION verifica_adocao()
+CREATE OR REPLACE FUNCTION verifica_estado_pet()
 RETURNS TRIGGER AS
 $$
 DECLARE
@@ -60,10 +60,10 @@ $$
 LANGUAGE 'plpgsql';
 
 -- Triggers
-CREATE OR REPLACE TRIGGER atualiza_adocao
+CREATE OR REPLACE TRIGGER atualiza_estado_pet
 BEFORE INSERT ON adocao
 FOR EACH ROW
-EXECUTE PROCEDURE verifica_adocao();
+EXECUTE PROCEDURE verifica_estado_pet();
 
 -- Povoamento das tabelas
 INSERT INTO dono VALUES
@@ -157,7 +157,8 @@ DROP TABLE doacao;
 DROP TABLE pet;
 DROP TABLE dono;
 DROP TABLE tipo_animal;
-
+DROP TRIGGER atualiza_estado_pet ON adocao;
+DROP FUNCTION verifica_estado_pet;
 -- Consultas que respondem as perguntas feitas e suas visões
 -- Quais pessoas realizaram uma doação de pet?
 CREATE OR REPLACE VIEW doadoresPet AS
@@ -286,3 +287,15 @@ CREATE OR REPLACE VIEW petMenosAdotado AS
     );
 
 SELECT * FROM petMenosAdotado;
+
+-- Droppers View
+DROP VIEW doadoresPet;
+DROP VIEW petsComDono;
+DROP VIEW qtdPets;
+DROP VIEW qtdPetsAdotados;
+DROP VIEW qtdPetsDisponiveis;
+DROP VIEW donoQueMaisAdotou;
+DROP VIEW doacaoPorDono;
+DROP VIEW adocoesPorDono;
+DROP VIEW petMaisAdotado;
+DROP VIEW petMenosAdotado;
