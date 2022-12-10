@@ -44,7 +44,7 @@ BEGIN
 	SELECT qtddoacao INTO qtddoacaodono
 	FROM doacaopordono as dpd
 	WHERE dpd.cpf = NEW.cpf_doador;
-	IF qtddoacaodono = 4 THEN
+	IF qtddoacaodono = 10 THEN
 		RAISE EXCEPTION 'Dono nao pode mais doar';
 	END IF;
 	RETURN NEW;
